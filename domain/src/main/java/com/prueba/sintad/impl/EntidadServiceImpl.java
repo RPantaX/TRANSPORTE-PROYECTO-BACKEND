@@ -1,6 +1,8 @@
 package com.prueba.sintad.impl;
 
 import com.prueba.sintad.aggregates.dto.EntidadDTO;
+import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
+import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
@@ -21,13 +23,13 @@ public class EntidadServiceImpl implements EntidadServiceIn {
     }
 
     @Override
-    public ResponseApi<EntidadDTO> saveEntidadIn(ResponseEntidad entidad) {
+    public ResponseApi<EntidadDTO> saveEntidadIn(RequestSaveEntidad entidad) {
         return entidadServiceOut.saveEntidadOut(entidad);
     }
 
     @Override
-    public ResponseApi<EntidadDTO> updateEntidadIn(ResponseEntidad entidad) {
-        return entidadServiceOut.updateEntidadOut(entidad);
+    public ResponseApi<EntidadDTO> updateEntidadIn(RequestUpdateEntidad entidad, Integer id) {
+        return entidadServiceOut.updateEntidadOut(entidad, id);
     }
 
     @Override

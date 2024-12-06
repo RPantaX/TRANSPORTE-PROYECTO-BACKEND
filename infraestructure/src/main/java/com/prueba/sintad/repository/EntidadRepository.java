@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface EntidadRepository extends JpaRepository<EntidadEntity, Integer> {
 
@@ -16,14 +18,22 @@ public interface EntidadRepository extends JpaRepository<EntidadEntity, Integer>
         "SELECT e FROM EntidadEntity e " +
         "LEFT JOIN FETCH e.tipoDocumento td " +
         "LEFT JOIN FETCH e.tipoContribuyente tc "+
-        "WHERE e.estado = :estado"
+        "WHERE e.id = :id "
         )
+    Optional<EntidadEntity> findEntidadById(Integer id);
+
+    @Query(
+        "SELECT e FROM EntidadEntity e " +
+        "LEFT JOIN FETCH e.tipoDocumento td " +
+        "LEFT JOIN FETCH e.tipoContribuyente tc "+
+        "WHERE e.estado = :estado"
+         )
     Page<EntidadEntity> findAllPageableByEstado(@Param("estado") Boolean estado, Pageable pageable);
 
     //ELIMINADO LOGICO
     @Modifying
     @Query("UPDATE EntidadEntity e SET e.estado = false WHERE e.id = :id")
-    void deleteEntidadById(@Param("id") Integer id);
+    EntidadEntity deleteEntidadById(@Param("id") Integer id);
 
     @Modifying
     @Query("UPDATE EntidadEntity e SET " +
@@ -33,7 +43,7 @@ public interface EntidadRepository extends JpaRepository<EntidadEntity, Integer>
             "e.direccion = :direccion, " +
             "e.telefono = :telefono " +
             "WHERE e.id = :id")
-    int updateById(@Param("id") Integer id,
+    EntidadEntity updateById(@Param("id") Integer id,
                       @Param("nroDocumento") String nroDocumento,
                       @Param("razonSocial") String razonSocial,
                       @Param("nombreComercial") String nombreComercial,
@@ -41,4 +51,5 @@ public interface EntidadRepository extends JpaRepository<EntidadEntity, Integer>
                       @Param("telefono") String telefono);
 
 
+    boolean existsByNroDocumento(String nroDocumento);
 }

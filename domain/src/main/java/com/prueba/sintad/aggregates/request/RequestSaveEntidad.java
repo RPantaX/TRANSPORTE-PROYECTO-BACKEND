@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class EntidadRequest {
+public class RequestSaveEntidad {
 
     private String nroDocumento;
 

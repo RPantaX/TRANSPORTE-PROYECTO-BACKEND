@@ -1,16 +1,16 @@
-package com.prueba.sintad.aggregates.response;
+package com.prueba.sintad.aggregates.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
-
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
-@Setter
-public class ResponseEntidad {
+public class RequestUpdateEntidad {
     private Integer id;
-
     private String nroDocumento;
 
     private String razonSocial;
@@ -20,8 +20,4 @@ public class ResponseEntidad {
     private String direccion;
 
     private String telefono;
-
-    private String tipoContribuyente;
-
-    private TipoDocumentoResponse tipoDocumentoResponse;
 }

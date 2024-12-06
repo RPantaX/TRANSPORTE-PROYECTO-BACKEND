@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ResponseEntidadListPageable {
-    private List<ResponseEntidad> responseCategoryList;
+    private List<ResponseEntidad> responseEntidadList;
     private int pageNumber;
     private int pageSize;
     private int totalPages;
