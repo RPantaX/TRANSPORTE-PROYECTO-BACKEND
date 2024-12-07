@@ -13,8 +13,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan("com.prueba.sintad.*")
 @EntityScan("com.prueba.sintad.*")
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-@EnableJpaRepositories("com.prueba.sintad.*")
 @EnableFeignClients("com.prueba.sintad.*")
+@EnableJpaRepositories("com.prueba.sintad")
 public class ApplicationLauncher {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationLauncher.class, args);

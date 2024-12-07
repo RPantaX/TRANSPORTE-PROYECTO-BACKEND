@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -60,7 +61,6 @@ public class EntidadAdapter implements EntidadServiceOut {
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
-
     @Override
     public ResponseApi<EntidadDTO> saveEntidadOut(RequestSaveEntidad entidad) {
         if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento())) throw new RuntimeException("Entidad ya existe");
@@ -139,11 +139,11 @@ public class EntidadAdapter implements EntidadServiceOut {
     }
 
     private void validateRazonSocial(String nroDocumento, String razonSocial, TipoDocumentoEntity tipoDocumentoEntity) {
-        if(tipoDocumentoEntity.getCodigo().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_RUC)){
-            validateDNI(nroDocumento,razonSocial );
-        }
-        if(tipoDocumentoEntity.getCodigo().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_DNI)){
-            validateRUC(nroDocumento, razonSocial);
+        if(tipoDocumentoEntity.getNombre().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_RUC)){
+            validateRUC(nroDocumento,razonSocial);
+            }
+        if(tipoDocumentoEntity.getNombre().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_DNI)){
+            validateDNI(nroDocumento, razonSocial);
         }
     }
 

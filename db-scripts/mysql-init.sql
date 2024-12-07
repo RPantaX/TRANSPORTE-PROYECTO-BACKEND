@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS `db_sintad`;
+USE db_sintad;
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------

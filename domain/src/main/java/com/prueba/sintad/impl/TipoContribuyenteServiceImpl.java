@@ -6,7 +6,9 @@ import com.prueba.sintad.aggregates.response.ResponseApiList;
 import com.prueba.sintad.ports.in.TipoContribuyenteServiceIn;
 import com.prueba.sintad.ports.out.TipoContribuyenteServiceOut;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class TipoContribuyenteServiceImpl implements TipoContribuyenteServiceIn {
 

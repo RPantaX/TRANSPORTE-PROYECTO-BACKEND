@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class EntidadController {
     private final EntidadServiceIn entidadServiceIn;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<ResponseApi<ResponseEntidadListPageable>> listEntidadPageableList(@RequestParam(value = "pageNo", defaultValue = Constants.NUM_PAG_BY_DEFECT, required = false) int pageNo,
                                                                                             @RequestParam(value = "pageSize", defaultValue = Constants.SIZE_PAG_BY_DEFECT, required = false) int pageSize,
                                                                                             @RequestParam(value = "sortBy", defaultValue = Constants.ORDER_BY_DEFECT_ALL, required = false) String sortBy,
@@ -29,7 +29,7 @@ public class EntidadController {
     public ResponseEntity<ResponseApi<ResponseEntidad>> getEntidadById(@PathVariable(value = "id") Integer id){
         return ResponseEntity.ok(entidadServiceIn.findEntidadByIdIn(id));
     }
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ResponseApi<EntidadDTO>> saveEntidad(@RequestBody RequestSaveEntidad requestSaveEntidad){
         return ResponseEntity.ok(entidadServiceIn.saveEntidadIn(requestSaveEntidad));
     }
