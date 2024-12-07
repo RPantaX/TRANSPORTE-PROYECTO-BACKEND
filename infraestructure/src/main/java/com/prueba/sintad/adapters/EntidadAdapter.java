@@ -105,7 +105,7 @@ public class EntidadAdapter implements EntidadServiceOut {
         if(!entidadEntity.getNroDocumento().equalsIgnoreCase(entidad.getNroDocumento())){
             //Validar si el nuevo nroDocumento ya existe
             if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento()))
-                throw new SintadAppNotAcceptableException("Entidad ya existe");
+                throw new SintadAppNotAcceptableException("La Entidad ya existe");
             validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), entidadEntity.getTipoDocumento());
         }
         else{
@@ -167,8 +167,8 @@ public class EntidadAdapter implements EntidadServiceOut {
     private void validateRUC(String nroDocumento, String razonSocial) {
         ResponseSunat responseSunat = getExecutionSunat(nroDocumento);
         if (!responseSunat.getRazonSocial().equalsIgnoreCase(razonSocial)) {
-            log.warn("Razon social de la entidad y de la sunat no son iguales");
-            throw new SintadAppNotAcceptableException("Razon social de la entidad y de la sunat no son iguales");
+            log.warn("La razón social no coincide con la información de SUNAT");
+            throw new SintadAppNotAcceptableException("La razón social no coincide con la información de SUNAT");
         }
     }
 
@@ -176,8 +176,8 @@ public class EntidadAdapter implements EntidadServiceOut {
         ResponseReniec responseReniec = getExecutionReniec(nroDocumento);
         String fullName  = responseReniec.getNombres() + " " + responseReniec.getApellidoPaterno() + " " + responseReniec.getApellidoMaterno();
         if (!fullName.equalsIgnoreCase(razonSocial)) {
-            log.warn("Nombres de la entidad y de la reniec no son iguales");
-            throw new SintadAppNotAcceptableException("Nombres de la entidad y de la reniec no son iguales");
+            log.warn("La razón social no coincide con la información de RENIEC");
+            throw new SintadAppNotAcceptableException("La razón social no coincide con la información de RENIEC");
         }
     }
 

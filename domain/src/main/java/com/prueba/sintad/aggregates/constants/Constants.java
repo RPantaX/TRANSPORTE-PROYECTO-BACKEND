@@ -20,6 +20,7 @@ public class Constants {
     public static final String MESSAGE_OK = "OK";
     public static final String TIPO_DOCUMENTO_DNI= "DNI";
     public static final String TIPO_DOCUMENTO_RUC= "RUC";
+
     public static final String NUM_PAG_BY_DEFECT="0";
     public static final String SIZE_PAG_BY_DEFECT="10";
     public static final String ORDER_BY_DEFECT_ALL="id";
