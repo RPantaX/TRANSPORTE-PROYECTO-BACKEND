@@ -1,9 +1,10 @@
 package com.prueba.sintad.adapters;
 
-
 import com.prueba.sintad.aggregates.constants.Constants;
 import com.prueba.sintad.aggregates.constants.Paths;
 import com.prueba.sintad.aggregates.dto.EntidadDTO;
+import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
+import com.prueba.sintad.aggregates.exceptions.SintadAppNotFoundException;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
@@ -12,26 +13,30 @@ import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 import com.prueba.sintad.aggregates.response.TipoDocumentoResponse;
 import com.prueba.sintad.aggregates.response.rest.ResponseReniec;
 import com.prueba.sintad.aggregates.response.rest.ResponseSunat;
+
 import com.prueba.sintad.entity.EntidadEntity;
 import com.prueba.sintad.entity.TipoContribuyenteEntity;
 import com.prueba.sintad.entity.TipoDocumentoEntity;
-import com.prueba.sintad.mapper.EntidadMapper;
-import com.prueba.sintad.ports.out.EntidadServiceOut;
+
 import com.prueba.sintad.repository.EntidadRepository;
 import com.prueba.sintad.repository.TipoContribuyenteRepository;
 import com.prueba.sintad.repository.TipoDocumentoRepository;
+
 import com.prueba.sintad.rest.client.ReniecClient;
 import com.prueba.sintad.rest.client.SunatClient;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.prueba.sintad.mapper.EntidadMapper;
+import com.prueba.sintad.ports.out.EntidadServiceOut;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -52,20 +57,27 @@ public class EntidadAdapter implements EntidadServiceOut {
 
     @Override
     public ResponseApi<ResponseEntidad> findEntidadByIdOut(Integer id) {
-        EntidadEntity entidadEntity = entidadRepository.findEntidadById(id).orElseThrow( () -> new RuntimeException("Entidad no encontrada"));
+        EntidadEntity entidadEntity = entidadRepository.findEntidadById(id).orElseThrow( () -> new SintadAppNotFoundException("Entidad no encontrada"));
 
         ResponseEntidad responseEntidad = getEntidad(entidadEntity);
 
-        String path = Paths.Entidad + "/" + id;
-        ResponseApi<ResponseEntidad> responseApi = createGenericResponseApi(responseEntidad,path);
+        String path = Paths.Entidad + id;
+        ResponseApi<ResponseEntidad> responseApi = createGenericResponseApi(responseEntidad,path, Constants.STATUS_OK);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
     @Override
     public ResponseApi<EntidadDTO> saveEntidadOut(RequestSaveEntidad entidad) {
-        if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento())) throw new RuntimeException("Entidad ya existe");
-        TipoDocumentoEntity tipoDocumentoEntity = tipoDocumentoRepository.findById(entidad.getIdTipoDocumento()).orElseThrow( () -> new RuntimeException("Tipo de documento no existe"));
-        TipoContribuyenteEntity tipoContribuyenteEntity = tipoContribuyenteRepository.findById(entidad.getIdTipoContribuyente()).orElseThrow( () -> new RuntimeException("Tipo de contribuyente no existe"));
+        if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento()))
+            throw new SintadAppNotAcceptableException("Entidad ya existe");
+        TipoDocumentoEntity tipoDocumentoEntity = tipoDocumentoRepository.findById(entidad.getIdTipoDocumento())
+                .orElseThrow( () -> new SintadAppNotAcceptableException("Tipo de documento no existe"));
+        TipoContribuyenteEntity tipoContribuyenteEntity = tipoContribuyenteRepository.findById(entidad.getIdTipoContribuyente())
+                .orElseThrow( () -> new SintadAppNotAcceptableException("Tipo de contribuyente no existe"));
+        // Convertir campos a mayúsculas
+        entidad.setRazonSocial(entidad.getRazonSocial().toUpperCase());
+        entidad.setDireccion(entidad.getDireccion().toUpperCase());
+        entidad.setNombreComercial(entidad.getNombreComercial().toUpperCase());
 
         validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), tipoDocumentoEntity);
 
@@ -73,45 +85,50 @@ public class EntidadAdapter implements EntidadServiceOut {
         EntidadEntity entidadSaved = entidadRepository.save(entidadEntity);
         EntidadDTO entidadDTO = entidadMapper.convertToDto(entidadSaved);
         String path = Paths.Entidad;
-        ResponseApi<EntidadDTO> responseApi = createGenericResponseApi(entidadDTO,path);
+        ResponseApi<EntidadDTO> responseApi = createGenericResponseApi(entidadDTO,path, Constants.STATUS_CREATED);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
 
-
     @Override
-    public ResponseApi<EntidadDTO> updateEntidadOut(RequestUpdateEntidad entidad, Integer id) {
-        if(entidad.getId().equals(id)) throw new RuntimeException("El id del path con el id de la entidad no coincide");
-        EntidadEntity entidadEntity = entidadRepository.findEntidadById(id).orElseThrow( () -> new RuntimeException("Entidad no encontrada"));
+    public ResponseApi<String> updateEntidadOut(RequestUpdateEntidad entidad, Integer id) {
+        if(!entidad.getId().equals(id))
+            throw new SintadAppNotAcceptableException("El id del path con el id de la entidad no coincide");
+        EntidadEntity entidadEntity = entidadRepository.findEntidadById(id)
+                .orElseThrow( () -> new SintadAppNotFoundException("Entidad no encontrada"));
+
+        // Convertir campos a mayúsculas
+        entidad.setRazonSocial(entidad.getRazonSocial().toUpperCase());
+        entidad.setDireccion(entidad.getDireccion().toUpperCase());
+        entidad.setNombreComercial(entidad.getNombreComercial().toUpperCase());
 
         if(!entidadEntity.getNroDocumento().equalsIgnoreCase(entidad.getNroDocumento())){
             //Validar si el nuevo nroDocumento ya existe
-            if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento())) throw new RuntimeException("Entidad ya existe");
+            if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento()))
+                throw new SintadAppNotAcceptableException("Entidad ya existe");
             validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), entidadEntity.getTipoDocumento());
         }
         else{
             //Si el nroDocumento es el mismo no tiene que validar si el nroDocumento ya existe
             validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), entidadEntity.getTipoDocumento());
         }
-        EntidadEntity entidadUpdated = entidadRepository.updateById(id, entidad.getNroDocumento(), entidad.getRazonSocial(), entidad.getNombreComercial(), entidad.getDireccion(), entidad.getTelefono());
-        log.info("Entidad actualizada de {} a {}", entidadEntity, entidadUpdated);
-        EntidadDTO entidadDTO = entidadMapper.convertToDto(entidadUpdated);
-        String path = Paths.Entidad + "/" + id;
-        ResponseApi<EntidadDTO> responseApi = createGenericResponseApi(entidadDTO,path);
+        entidadRepository.updateEntidadById(id, entidad.getNroDocumento(), entidad.getRazonSocial(), entidad.getNombreComercial(), entidad.getDireccion(), entidad.getTelefono());
+        log.info("Entidad actualizada de {} a {}", entidadEntity, entidad);
+        String path = Paths.Entidad + id;
+        ResponseApi<String> responseApi = createGenericResponseApi(Constants.OPERATION_SUCCESS,path, Constants.STATUS_OK);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
 
     @Override
-    public ResponseApi<EntidadDTO> deleteEntidadOut(Integer id) {
-        if (!entidadRepository.existsById(id)) throw new RuntimeException("Entidad no encontrada");
+    public ResponseApi<String> deleteEntidadOut(Integer id) {
+        if (!entidadRepository.existsById(id)) throw new SintadAppNotFoundException("Entidad no encontrada");
         //eliminado logico
-        EntidadEntity entidadDeleted = entidadRepository.deleteEntidadById(id);
-        EntidadDTO entidadDTO = entidadMapper.convertToDto(entidadDeleted);
-        String path = Paths.Entidad + "/" + id;
-        ResponseApi<EntidadDTO> responseApi = createGenericResponseApi(entidadDTO,path);
+        entidadRepository.deleteEntidadById(id);
+        String path = Paths.Entidad + id;
+        ResponseApi<String> responseApi = createGenericResponseApi(Constants.OPERATION_SUCCESS,path, Constants.STATUS_OK);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
-        return null;
+        return responseApi;
     }
 
     @Override
@@ -133,7 +150,7 @@ public class EntidadAdapter implements EntidadServiceOut {
                 .totalElements(entidadPageableList.getTotalElements())
                 .end(entidadPageableList.isLast())
                 .build();
-        ResponseApi<ResponseEntidadListPageable> responseApi = createGenericResponseApi(responseEntidadListPageable,path);
+        ResponseApi<ResponseEntidadListPageable> responseApi = createGenericResponseApi(responseEntidadListPageable,path, Constants.STATUS_OK);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
@@ -150,8 +167,8 @@ public class EntidadAdapter implements EntidadServiceOut {
     private void validateRUC(String nroDocumento, String razonSocial) {
         ResponseSunat responseSunat = getExecutionSunat(nroDocumento);
         if (!responseSunat.getRazonSocial().equalsIgnoreCase(razonSocial)) {
-            log.info("Razon social de la entidad y de la sunat no son iguales");
-            throw new RuntimeException("Razon social de la entidad y de la sunat no son iguales");
+            log.warn("Razon social de la entidad y de la sunat no son iguales");
+            throw new SintadAppNotAcceptableException("Razon social de la entidad y de la sunat no son iguales");
         }
     }
 
@@ -159,8 +176,8 @@ public class EntidadAdapter implements EntidadServiceOut {
         ResponseReniec responseReniec = getExecutionReniec(nroDocumento);
         String fullName  = responseReniec.getNombres() + " " + responseReniec.getApellidoPaterno() + " " + responseReniec.getApellidoMaterno();
         if (!fullName.equalsIgnoreCase(razonSocial)) {
-            log.info("Nombres de la entidad y de la reniec no son iguales");
-            throw new RuntimeException("Nombres de la entidad y de la reniec no son iguales");
+            log.warn("Nombres de la entidad y de la reniec no son iguales");
+            throw new SintadAppNotAcceptableException("Nombres de la entidad y de la reniec no son iguales");
         }
     }
 
@@ -177,11 +194,11 @@ public class EntidadAdapter implements EntidadServiceOut {
                 .build();
     }
 
-    private <T> ResponseApi<T> createGenericResponseApi(T data, String path) {
+    private <T> ResponseApi<T> createGenericResponseApi(T data, String path, String status) {
         return ResponseApi.<T>builder()
                 .path(path)
                 .message(Constants.MESSAGE_OK)
-                .status(Constants.STATUS_OK)
+                .status(status)
                 .timestamp(Constants.getTimestamp())
                 .data(data)
                 .build();

@@ -28,12 +28,12 @@ public class EntidadServiceImpl implements EntidadServiceIn {
     }
 
     @Override
-    public ResponseApi<EntidadDTO> updateEntidadIn(RequestUpdateEntidad entidad, Integer id) {
+    public ResponseApi<String> updateEntidadIn(RequestUpdateEntidad entidad, Integer id) {
         return entidadServiceOut.updateEntidadOut(entidad, id);
     }
 
     @Override
-    public ResponseApi<EntidadDTO> deleteEntidadIn(Integer id) {
+    public ResponseApi<String> deleteEntidadIn(Integer id) {
         return entidadServiceOut.deleteEntidadOut(id);
     }
 

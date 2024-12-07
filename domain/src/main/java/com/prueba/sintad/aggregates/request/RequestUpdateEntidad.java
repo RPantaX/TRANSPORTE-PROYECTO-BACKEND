@@ -4,18 +4,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 public class RequestUpdateEntidad {
     @NotNull(message = "El ID de la entidad no puede ser nulo")
     private Integer id;
+    //logica en base a https://www2.sunat.gob.pe/pdt/pdtModulos/independientes/p695/TipoDoc.htm
     @Size(min = 8, max = 15, message = "El número de documento debe tener entre 8 y 15 caracteres")
     @Pattern(regexp = "\\d+", message = "El número de documento solo puede contener dígitos")
     @NotBlank(message = "El número de documento no puede estar vacío")

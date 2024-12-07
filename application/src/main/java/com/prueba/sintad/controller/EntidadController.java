@@ -8,7 +8,9 @@ import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 import com.prueba.sintad.ports.in.EntidadServiceIn;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,15 +32,15 @@ public class EntidadController {
         return ResponseEntity.ok(entidadServiceIn.findEntidadByIdIn(id));
     }
     @PostMapping
-    public ResponseEntity<ResponseApi<EntidadDTO>> saveEntidad(@RequestBody RequestSaveEntidad requestSaveEntidad){
-        return ResponseEntity.ok(entidadServiceIn.saveEntidadIn(requestSaveEntidad));
+    public ResponseEntity<ResponseApi<EntidadDTO>> saveEntidad(@Valid @RequestBody RequestSaveEntidad requestSaveEntidad){
+        return new ResponseEntity<>(entidadServiceIn.saveEntidadIn(requestSaveEntidad), HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseApi<EntidadDTO>> updateEntidad(@PathVariable(value = "id") Integer id, @RequestBody RequestUpdateEntidad requestUpdateEntidad){
+    public ResponseEntity<ResponseApi<String>> updateEntidad(@PathVariable(value = "id") Integer id, @Valid @RequestBody RequestUpdateEntidad requestUpdateEntidad){
         return ResponseEntity.ok(entidadServiceIn.updateEntidadIn(requestUpdateEntidad,id));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseApi<EntidadDTO>> deleteEntidad(@PathVariable(value = "id") Integer id){
+    public ResponseEntity<ResponseApi<String>> deleteEntidad(@PathVariable(value = "id") Integer id){
         return ResponseEntity.ok(entidadServiceIn.deleteEntidadIn(id));
     }
 }
