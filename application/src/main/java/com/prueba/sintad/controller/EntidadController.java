@@ -1,15 +1,16 @@
 package com.prueba.sintad.controller;
 
 import com.prueba.sintad.aggregates.constants.Constants;
-import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
+
 import com.prueba.sintad.ports.in.EntidadServiceIn;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -22,11 +22,6 @@ public class AuthenticationServiceImpl implements AuthenticationServiceIn {
     }
 
     @Override
-    public UserDTO signUpAdminIn(SignUpRequest signUpRequest) {
-        return authenticationServiceOut.signUpAdminOut(signUpRequest);
-    }
-
-    @Override
     public AuthenticationResponse signinIn(SignInRequest signInRequest) {
         return authenticationServiceOut.signinOut(signInRequest);
     }

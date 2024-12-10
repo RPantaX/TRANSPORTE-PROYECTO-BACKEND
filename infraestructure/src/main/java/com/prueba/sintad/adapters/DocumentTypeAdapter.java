@@ -6,13 +6,16 @@ import com.prueba.sintad.aggregates.dto.DocumentTypeDTO;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseApiList;
+
 import com.prueba.sintad.entity.DocumentTypeEntity;
 import com.prueba.sintad.mapper.DocumentTypeMapper;
-import com.prueba.sintad.ports.in.DocumentTypeServiceIn;
 import com.prueba.sintad.ports.out.DocumentTypeServiceOut;
 import com.prueba.sintad.repository.DocumentTypeRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;

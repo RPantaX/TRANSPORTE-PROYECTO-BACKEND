@@ -1,6 +1,5 @@
 package com.prueba.sintad.impl;
 
-import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;

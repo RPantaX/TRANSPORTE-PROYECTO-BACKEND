@@ -1,6 +1,5 @@
 package com.prueba.sintad.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 

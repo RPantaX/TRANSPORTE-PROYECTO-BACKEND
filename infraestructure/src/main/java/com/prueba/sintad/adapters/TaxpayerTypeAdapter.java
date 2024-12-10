@@ -6,10 +6,12 @@ import com.prueba.sintad.aggregates.dto.TaxpayerTypeDTO;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseApiList;
+
 import com.prueba.sintad.entity.TaxpayerTypeEntity;
 import com.prueba.sintad.mapper.TaxpayerTypeMapper;
 import com.prueba.sintad.ports.out.TaxpayerTypeServiceOut;
 import com.prueba.sintad.repository.TaxpayerTypeRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -4,8 +4,10 @@ import com.prueba.sintad.aggregates.dto.DocumentTypeDTO;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseApiList;
 import com.prueba.sintad.ports.in.DocumentTypeServiceIn;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

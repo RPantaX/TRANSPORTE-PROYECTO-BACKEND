@@ -8,6 +8,5 @@ import com.prueba.sintad.aggregates.response.security.AuthenticationResponse;
 
 public interface AuthenticationServiceIn {
     ResponseApi<UserDTO> signUpIn(SignUpRequest signUpRequest);
-    UserDTO signUpAdminIn(SignUpRequest signUpRequest);
     AuthenticationResponse signinIn(SignInRequest signInRequest);
 }

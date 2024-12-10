@@ -7,21 +7,27 @@ import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
 import com.prueba.sintad.aggregates.request.security.SignInRequest;
 import com.prueba.sintad.aggregates.request.security.SignUpRequest;
 import com.prueba.sintad.aggregates.response.ResponseApi;
-import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.security.AuthenticationResponse;
+
 import com.prueba.sintad.entity.security.Role;
 import com.prueba.sintad.entity.security.UserEntity;
+
 import com.prueba.sintad.mapper.UserMapper;
+
 import com.prueba.sintad.ports.in.security.JWTServiceIn;
 import com.prueba.sintad.ports.out.security.AuthenticationServiceOut;
+
 import com.prueba.sintad.repository.security.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -55,11 +61,6 @@ public class AuthenticationAdapter implements AuthenticationServiceOut {
         ResponseApi<UserDTO> responseApi = createGenericResponseApi(userDTO,path, Constants.STATUS_OK);
         log.info("User saved: {}", userSaved);
         return responseApi;
-    }
-
-    @Override
-    public UserDTO signUpAdminOut(SignUpRequest signUpRequest) {
-        return null;
     }
 
     @Override
