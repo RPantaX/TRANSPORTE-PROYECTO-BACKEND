@@ -16,26 +16,26 @@ public class RequestSaveEntidad {
     @Size(min = 8, max = 15, message = "El número de documento debe tener entre 8 y 15 caracteres")
     @Pattern(regexp = "\\d+", message = "El número de documento solo puede contener dígitos")
     @NotBlank(message = "El número de documento no puede estar vacío")
-    private String nroDocumento;
+    private String documentNumber;
 
     @Size(max = 100, message = "La razón social debe tener entre 1 y 100 caracteres")
     @NotBlank(message = "La razón social no puede estar vacía")
-    private String razonSocial;
+    private String legalName;
 
     @Size(min = 1, max = 100, message = "El nombre comercial debe tener entre 1 y 100 caracteres")
-    private String nombreComercial;
+    private String commercialName;
 
-    @Size(min = 5, max = 100, message = "La dirección debe tener entre 5 y 100 caracteres")
-    private String direccion;
+    @Size(max = 100, message = "La dirección debe tener entre 5 y 100 caracteres")
+    private String address;
 
     @Size(min = 5, max = 50, message = "El teléfono debe tener entre 5 y 50 caracteres")
-    @Pattern(regexp = "\\d+", message = "El teléfono solo puede contener dígitos")
-    private String telefono;
+    @Pattern(regexp = "\\d+", message = "El teléfono solo puede contener numeros")
+    private String phone;
 
     @NotNull(message = "El ID del tipo de documento no puede ser nulo")
-    private Integer idTipoDocumento;
+    private Integer taxpayerTypeId;
 
     @NotNull(message = "El ID del tipo de contribuyente no puede ser nulo")
-    private Integer idTipoContribuyente;
+    private Integer documentTypeId;
 
 }

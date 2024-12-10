@@ -12,15 +12,13 @@ public class EntidadDTO {
 
     private Integer id;
 
-    private String nroDocumento;
+    private String documentNumber;
 
-    private String razonSocial;
+    private String legalName;
 
-    private String nombreComercial;
+    private String commercialName;
 
-    private String direccion;
+    private String address;
 
-    private String telefono;
-
-    private Boolean estado;
+    private String phone;
 }

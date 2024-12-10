@@ -12,12 +12,12 @@ import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 import com.prueba.sintad.aggregates.response.rest.ResponseReniec;
 import com.prueba.sintad.aggregates.response.rest.ResponseSunat;
 import com.prueba.sintad.entity.EntidadEntity;
-import com.prueba.sintad.entity.TipoContribuyenteEntity;
-import com.prueba.sintad.entity.TipoDocumentoEntity;
+import com.prueba.sintad.entity.DocumentTypeEntity;
+import com.prueba.sintad.entity.TaxpayerTypeEntity;
 import com.prueba.sintad.mapper.EntidadMapper;
 import com.prueba.sintad.repository.EntidadRepository;
-import com.prueba.sintad.repository.TipoContribuyenteRepository;
-import com.prueba.sintad.repository.TipoDocumentoRepository;
+import com.prueba.sintad.repository.TaxpayerTypeRepository;
+import com.prueba.sintad.repository.DocumentTypeRepository;
 import com.prueba.sintad.rest.client.ReniecClient;
 import com.prueba.sintad.rest.client.SunatClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +40,9 @@ class EntidadAdapterTest {
     @Mock
     private EntidadRepository entidadRepository;
     @Mock
-    private TipoContribuyenteRepository tipoContribuyenteRepository;
+    private TaxpayerTypeRepository taxpayerTypeRepository;
     @Mock
-    private TipoDocumentoRepository tipoDocumentoRepository;
+    private DocumentTypeRepository documentTypeRepository;
     @Mock
     private EntidadMapper entidadMapper;
     @Mock
@@ -62,19 +62,19 @@ class EntidadAdapterTest {
         //Mock para requestSavedEntidad
         RequestSaveEntidad request = getSaveEntidadRequest();
         //Tipos de documentos esperados
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("PASAPORTE");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("PASAPORTE");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
         EntidadEntity entidadEntitySaved = getEntidadEntity();
         EntidadDTO entidadDTOEsperada = getEntidadDTO();
         //comportamiento
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(taxpayerTypeEntity));
         when(entidadRepository.save(any(EntidadEntity.class))).thenReturn(entidadEntitySaved);
         when(entidadMapper.convertToDto(entidadEntitySaved)).thenReturn(entidadDTOEsperada);
 
         // Execute
-        ResponseApi<EntidadDTO> response = entidadAdapter.saveEntidadOut(request);
+        ResponseApi<ResponseEntidad> response = entidadAdapter.saveEntidadOut(request);
 
         // Verify
         //verificamos los mensajes y estados.
@@ -84,11 +84,11 @@ class EntidadAdapterTest {
         assertNotNull(response.getData());
         //verificamos el cuerpo
         assertEquals(entidadDTOEsperada.getId(), response.getData().getId());
-        assertEquals(entidadDTOEsperada.getNroDocumento(), response.getData().getNroDocumento());
-        assertEquals(entidadDTOEsperada.getRazonSocial(), response.getData().getRazonSocial());
-        assertEquals(entidadDTOEsperada.getNombreComercial(), response.getData().getNombreComercial());
-        assertEquals(entidadDTOEsperada.getDireccion(), response.getData().getDireccion());
-        assertEquals(entidadDTOEsperada.getTelefono(), response.getData().getTelefono());
+        assertEquals(entidadDTOEsperada.getDocumentNumber(), response.getData().getDocumentNumber());
+        assertEquals(entidadDTOEsperada.getLegalName(), response.getData().getLegalName());
+        assertEquals(entidadDTOEsperada.getCommercialName(), response.getData().getCommercialName());
+        assertEquals(entidadDTOEsperada.getAddress(), response.getData().getAddress());
+        assertEquals(entidadDTOEsperada.getPhone(), response.getData().getPhone());
         verify(entidadRepository, times(1)).save(any(EntidadEntity.class));
     }
     @Test
@@ -96,8 +96,8 @@ class EntidadAdapterTest {
         //Mock para requestSavedEntidad
         RequestSaveEntidad request = getSaveEntidadRequest();
         //Tipos de documentos esperados
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
         EntidadEntity entidadEntitySaved = getEntidadEntity();
         ResponseReniec infoReniec = getResponseReniec();
         EntidadDTO entidadDTOEsperada = getEntidadDTO();
@@ -105,15 +105,15 @@ class EntidadAdapterTest {
         ReflectionTestUtils.setField(entidadAdapter,"tokenApi","XXXXXXXX",String.class);
 
         //comportamiento
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(taxpayerTypeEntity));
         when(reniecClient.getInfoReniec(anyString(), anyString())).thenReturn(infoReniec);
         when(entidadRepository.save(any(EntidadEntity.class))).thenReturn(entidadEntitySaved);
         when(entidadMapper.convertToDto(entidadEntitySaved)).thenReturn(entidadDTOEsperada);
 
         // Execute
-        ResponseApi<EntidadDTO> response = entidadAdapter.saveEntidadOut(request);
+        ResponseApi<ResponseEntidad> response = entidadAdapter.saveEntidadOut(request);
 
         // Verify
         //verificamos los mensajes y estados.
@@ -123,11 +123,11 @@ class EntidadAdapterTest {
         assertNotNull(response.getData());
         //verificamos el cuerpo
         assertEquals(entidadDTOEsperada.getId(), response.getData().getId());
-        assertEquals(entidadDTOEsperada.getNroDocumento(), response.getData().getNroDocumento());
-        assertEquals(entidadDTOEsperada.getRazonSocial(), response.getData().getRazonSocial());
-        assertEquals(entidadDTOEsperada.getNombreComercial(), response.getData().getNombreComercial());
-        assertEquals(entidadDTOEsperada.getDireccion(), response.getData().getDireccion());
-        assertEquals(entidadDTOEsperada.getTelefono(), response.getData().getTelefono());
+        assertEquals(entidadDTOEsperada.getDocumentNumber(), response.getData().getDocumentNumber());
+        assertEquals(entidadDTOEsperada.getLegalName(), response.getData().getLegalName());
+        assertEquals(entidadDTOEsperada.getCommercialName(), response.getData().getCommercialName());
+        assertEquals(entidadDTOEsperada.getAddress(), response.getData().getAddress());
+        assertEquals(entidadDTOEsperada.getPhone(), response.getData().getPhone());
         verify(entidadRepository, times(1)).save(any(EntidadEntity.class));
     }
 
@@ -136,8 +136,8 @@ class EntidadAdapterTest {
         //Mock para requestSavedEntidad
         RequestSaveEntidad request = getSaveEntidadRequest();
         //Tipos de documentos esperados
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
         EntidadEntity entidadEntitySaved = getEntidadEntity();
         ResponseSunat infoSUNAT = getResponseSUNAT();
         EntidadDTO entidadDTOEsperada = getEntidadDTO();
@@ -145,15 +145,15 @@ class EntidadAdapterTest {
         ReflectionTestUtils.setField(entidadAdapter,"tokenApi","XXXXXXXX",String.class);
 
         //comportamiento
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(taxpayerTypeEntity));
         when(sunatClient.getInfoSunat(anyString(), anyString())).thenReturn(infoSUNAT);
         when(entidadRepository.save(any(EntidadEntity.class))).thenReturn(entidadEntitySaved);
         when(entidadMapper.convertToDto(entidadEntitySaved)).thenReturn(entidadDTOEsperada);
 
         // Execute
-        ResponseApi<EntidadDTO> response = entidadAdapter.saveEntidadOut(request);
+        ResponseApi<ResponseEntidad> response = entidadAdapter.saveEntidadOut(request);
 
         // Verify
         //verificamos los mensajes y estados.
@@ -163,11 +163,11 @@ class EntidadAdapterTest {
         assertNotNull(response.getData());
         //verificamos el cuerpo
         assertEquals(entidadDTOEsperada.getId(), response.getData().getId());
-        assertEquals(entidadDTOEsperada.getNroDocumento(), response.getData().getNroDocumento());
-        assertEquals(entidadDTOEsperada.getRazonSocial(), response.getData().getRazonSocial());
-        assertEquals(entidadDTOEsperada.getNombreComercial(), response.getData().getNombreComercial());
-        assertEquals(entidadDTOEsperada.getDireccion(), response.getData().getDireccion());
-        assertEquals(entidadDTOEsperada.getTelefono(), response.getData().getTelefono());
+        assertEquals(entidadDTOEsperada.getDocumentNumber(), response.getData().getDocumentNumber());
+        assertEquals(entidadDTOEsperada.getLegalName(), response.getData().getLegalName());
+        assertEquals(entidadDTOEsperada.getCommercialName(), response.getData().getCommercialName());
+        assertEquals(entidadDTOEsperada.getAddress(), response.getData().getAddress());
+        assertEquals(entidadDTOEsperada.getPhone(), response.getData().getPhone());
         verify(entidadRepository, times(1)).save(any(EntidadEntity.class));
     }
 
@@ -176,7 +176,7 @@ class EntidadAdapterTest {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
 
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(true);
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(true);
 
         // Execute & Verify
         Exception exception= assertThrows(SintadAppNotAcceptableException.class, () -> entidadAdapter.saveEntidadOut(request));
@@ -189,8 +189,8 @@ class EntidadAdapterTest {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
 
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.empty());
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.empty());
 
         // Execute & Verify
         Exception exception= assertThrows(SintadAppNotAcceptableException.class, () -> entidadAdapter.saveEntidadOut(request));
@@ -203,9 +203,9 @@ class EntidadAdapterTest {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
 
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(getTipoDocumento("DNI")));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.empty());
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(getTipoDocumento("DNI")));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.empty());
 
         // Execute & Verify
         Exception exception= assertThrows(SintadAppNotAcceptableException.class, () -> entidadAdapter.saveEntidadOut(request));
@@ -216,12 +216,12 @@ class EntidadAdapterTest {
     void testSaveEntidadOut_ReniecClientThrowsException_ThrowsException() {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
 
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(taxpayerTypeEntity));
         when(reniecClient.getInfoReniec(anyString(), anyString())).thenThrow(RuntimeException.class);
 
         // Execute & Verify
@@ -232,12 +232,12 @@ class EntidadAdapterTest {
     void testSaveEntidadOut_SunatClientThrowsException_ThrowsException() {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity tipoContribuyenteEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
 
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(tipoContribuyenteEntity));
         when(sunatClient.getInfoSunat(anyString(), anyString())).thenThrow(RuntimeException.class);
 
         // Execute & Verify
@@ -249,17 +249,17 @@ class EntidadAdapterTest {
     void testSaveEntidadOut_RazonSocialIsNotEqualsToReniec_ThrowsException() {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
         ResponseReniec infoReniec = getResponseReniec();
         infoReniec.setNombres("Juan Carlos");
         //simulamos un token
         ReflectionTestUtils.setField(entidadAdapter,"tokenApi","XXXXXXXX",String.class);
 
         //comportamiento
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(taxpayerTypeEntity));
         when(reniecClient.getInfoReniec(anyString(), anyString())).thenReturn(infoReniec);
 
         // Execute & Verify
@@ -272,17 +272,17 @@ class EntidadAdapterTest {
     void testSaveEntidadOut_RazonSocialIsNotEqualsToSunat_ThrowsException() {
         // Mock inputs
         RequestSaveEntidad request = getSaveEntidadRequest();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity tipoContribuyenteEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
         ResponseSunat infoSunat = getResponseSUNAT();
         infoSunat.setRazonSocial("Juan Carlos");
         //simulamos un token
         ReflectionTestUtils.setField(entidadAdapter,"tokenApi","XXXXXXXX",String.class);
 
         //comportamiento
-        when(entidadRepository.existsByNroDocumento(request.getNroDocumento())).thenReturn(false);
-        when(tipoDocumentoRepository.findById(request.getIdTipoDocumento())).thenReturn(Optional.of(tipoDocumentoEntity));
-        when(tipoContribuyenteRepository.findById(request.getIdTipoContribuyente())).thenReturn(Optional.of(tipoContribuyenteEntity));
+        when(entidadRepository.existsByDocumentNumber(request.getDocumentNumber())).thenReturn(false);
+        when(documentTypeRepository.findById(request.getDocumentTypeId())).thenReturn(Optional.of(documentTypeEntity));
+        when(taxpayerTypeRepository.findById(request.getTaxpayerTypeId())).thenReturn(Optional.of(tipoContribuyenteEntity));
         when(sunatClient.getInfoSunat(anyString(), anyString())).thenReturn(infoSunat);
 
         // Execute & Verify
@@ -295,11 +295,11 @@ class EntidadAdapterTest {
     void testFindEntidadByIdOut_Success() {
         Integer id = 1;
         EntidadEntity mockEntidad = new EntidadEntity();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
         mockEntidad.setId(id);
-        mockEntidad.setTipoDocumento(tipoDocumentoEntity);
-        mockEntidad.setTipoContribuyente(tipoContribuyenteEntity);
+        mockEntidad.setDocumentTypeEntity(documentTypeEntity);
+        mockEntidad.setTaxpayerTypeEntity(taxpayerTypeEntity);
         Optional<EntidadEntity> entidad = Optional.of(mockEntidad);
 
         when(entidadRepository.findEntidadById(id)).thenReturn(entidad);
@@ -328,10 +328,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("OTROS");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("OTROS");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         // Mock repository
         when(entidadRepository.findEntidadById(id)).thenReturn(Optional.of(entidadEntity));
         when(entidadRepository.updateEntidadById(anyInt(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
@@ -352,10 +352,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         ResponseReniec infoReniec = getResponseReniec();
         infoReniec.setNombres("Jefferson Alessandro");
         infoReniec.setApellidoPaterno("Panta");
@@ -384,10 +384,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         ResponseSunat infoSunat = getResponseSUNAT();
         infoSunat.setRazonSocial("Jefferson Alessandro Panta Ruiz");
         //simulamos un token
@@ -442,12 +442,12 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        entidadEntityUpdated.setNroDocumento("553456789");
+        entidadEntityUpdated.setDocumentNumber("553456789");
         EntidadEntity entidadEntityDuplicated = getEntidadEntity();
         entidadEntityDuplicated.setId(2);
         // Mock repository
         when(entidadRepository.findEntidadById(id)).thenReturn(Optional.of(entidadEntity));
-        when(entidadRepository.existsByNroDocumento(entidadEntityUpdated.getNroDocumento())).thenReturn(true);
+        when(entidadRepository.existsByDocumentNumber(entidadEntityUpdated.getDocumentNumber())).thenReturn(true);
 
         Exception exception= assertThrows(SintadAppNotAcceptableException.class, () -> entidadAdapter.updateEntidadOut(entidadEntityUpdated, id));
         assertEquals("La Entidad ya existe", exception.getMessage());
@@ -459,10 +459,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         ResponseReniec infoReniec = getResponseReniec();
         infoReniec.setNombres("Juan Carlos");
         //simulamos un token
@@ -484,10 +484,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         ResponseSunat infoSunat = getResponseSUNAT();
         infoSunat.setRazonSocial("Juan Carlos");
         //simulamos un token
@@ -508,10 +508,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("DNI");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "NATURAL", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("DNI");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "NATURAL", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         // Mock repository
         when(entidadRepository.findEntidadById(id)).thenReturn(Optional.of(entidadEntity));
         when(reniecClient.getInfoReniec(anyString(), anyString())).thenThrow(RuntimeException.class);
@@ -526,10 +526,10 @@ class EntidadAdapterTest {
         Integer id = 1;
         EntidadEntity entidadEntity = getEntidadEntity();
         RequestUpdateEntidad entidadEntityUpdated = getEntidadToUpdate();
-        TipoDocumentoEntity tipoDocumentoEntity = getTipoDocumento("RUC");
-        TipoContribuyenteEntity tipoContribuyenteEntity = new TipoContribuyenteEntity(1, "JURIDICA", true);
-        entidadEntity.setTipoDocumento(tipoDocumentoEntity);
-        entidadEntity.setTipoContribuyente(tipoContribuyenteEntity);
+        DocumentTypeEntity documentTypeEntity = getTipoDocumento("RUC");
+        TaxpayerTypeEntity taxpayerTypeEntity = new TaxpayerTypeEntity(1, "JURIDICA", true);
+        entidadEntity.setDocumentTypeEntity(documentTypeEntity);
+        entidadEntity.setTaxpayerTypeEntity(taxpayerTypeEntity);
         // Mock repository
         when(entidadRepository.findEntidadById(id)).thenReturn(Optional.of(entidadEntity));
         when(sunatClient.getInfoSunat(anyString(), anyString())).thenThrow(RuntimeException.class);
@@ -600,11 +600,11 @@ class EntidadAdapterTest {
     private RequestUpdateEntidad getEntidadToUpdate() {
         return RequestUpdateEntidad.builder()
                 .id(1)
-                .nroDocumento("123456789")
-                .razonSocial("Jefferson Alessandro Panta Ruiz")
-                .nombreComercial("COMERCIAL UPDATED")
-                .direccion("AV. UPDATED")
-                .telefono("123456789")
+                .documentNumber("123456789")
+                .legalName("Jefferson Alessandro Panta Ruiz")
+                .commercialName("COMERCIAL UPDATED")
+                .address("AV. UPDATED")
+                .phone("123456789")
                 .build();
     }
 
@@ -620,37 +620,37 @@ class EntidadAdapterTest {
 
     private RequestSaveEntidad getSaveEntidadRequest() {
         return RequestSaveEntidad.builder()
-                .nroDocumento("123456789")
-                .razonSocial("Juan Perez Lopez")
-                .nombreComercial("COMERCIAL")
-                .direccion("AV. PRINCIPAL 123")
-                .telefono("987654321")
-                .idTipoDocumento(1)
-                .idTipoContribuyente(1)
+                .documentNumber("123456789")
+                .legalName("Juan Perez Lopez")
+                .commercialName("COMERCIAL")
+                .address("AV. PRINCIPAL 123")
+                .phone("987654321")
+                .documentTypeId(1)
+                .taxpayerTypeId(1)
                 .build();
     }
 
-    private TipoDocumentoEntity getTipoDocumento(String nombre) {
-        return new TipoDocumentoEntity(1, "01", nombre, "XXXXXXXXXXXX", true);
+    private DocumentTypeEntity getTipoDocumento(String nombre) {
+        return new DocumentTypeEntity(1, "01", nombre, "XXXXXXXXXXXX", true);
     }
 
     private EntidadEntity getEntidadEntity() {
         return EntidadEntity.builder()
-                .nroDocumento("123456789")
-                .razonSocial("Juan Perez Lopez")
-                .nombreComercial("COMERCIAL")
-                .direccion("AV. PRINCIPAL 123")
-                .telefono("987654321")
+                .documentNumber("123456789")
+                .legalName("Juan Perez Lopez")
+                .commercialName("COMERCIAL")
+                .address("AV. PRINCIPAL 123")
+                .phone("987654321")
                 .build();
     }
 
     private EntidadDTO getEntidadDTO() {
         return EntidadDTO.builder()
-                .nroDocumento("123456789")
-                .razonSocial("Juan Perez Lopez")
-                .nombreComercial("COMERCIAL")
-                .direccion("AV. PRINCIPAL 123")
-                .telefono("987654321")
+                .documentNumber("123456789")
+                .legalName("JUAN PEREZ LOPEZ")
+                .commercialName("COMERCIAL")
+                .address("AV. PRINCIPAL 123")
+                .phone("987654321")
                 .build();
     }
 

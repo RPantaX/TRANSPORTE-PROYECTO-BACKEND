@@ -17,42 +17,42 @@ public interface EntidadRepository extends JpaRepository<EntidadEntity, Integer>
 
     @Query(
         "SELECT e FROM EntidadEntity e " +
-        "LEFT JOIN FETCH e.tipoDocumento td " +
-        "LEFT JOIN FETCH e.tipoContribuyente tc "+
+        "LEFT JOIN FETCH e.documentTypeEntity td " +
+        "LEFT JOIN FETCH e.taxpayerTypeEntity tc "+
         "WHERE e.id = :id "
         )
     Optional<EntidadEntity> findEntidadById(Integer id);
 
     @Query(
         "SELECT e FROM EntidadEntity e " +
-        "LEFT JOIN FETCH e.tipoDocumento td " +
-        "LEFT JOIN FETCH e.tipoContribuyente tc "+
-        "WHERE e.estado = :estado"
+        "LEFT JOIN FETCH e.documentTypeEntity td " +
+        "LEFT JOIN FETCH e.taxpayerTypeEntity tc "+
+        "WHERE e.state = :state "
          )
-    Page<EntidadEntity> findAllPageableByEstado(@Param("estado") Boolean estado, Pageable pageable);
+    Page<EntidadEntity> findAllPageableByEstado(@Param("state") Boolean state, Pageable pageable);
 
     //ELIMINADO LOGICO
     @Transactional
     @Modifying
-    @Query("UPDATE EntidadEntity e SET e.estado = false WHERE e.id = :id")
+    @Query("UPDATE EntidadEntity e SET e.state = false WHERE e.id = :id")
     int deleteEntidadById(@Param("id") Integer id);
 
     @Transactional
     @Modifying
     @Query("UPDATE EntidadEntity e SET " +
-            "e.nroDocumento = :nroDocumento, " +
-            "e.razonSocial = :razonSocial, " +
-            "e.nombreComercial = :nombreComercial, " +
-            "e.direccion = :direccion, " +
-            "e.telefono = :telefono " +
+            "e.documentNumber = :documentNumber, " +
+            "e.legalName = :legalName, " +
+            "e.commercialName = :commercialName, " +
+            "e.address = :address, " +
+            "e.phone = :phone " +
             "WHERE e.id = :id")
     int updateEntidadById(@Param("id") Integer id,
-                      @Param("nroDocumento") String nroDocumento,
-                      @Param("razonSocial") String razonSocial,
-                      @Param("nombreComercial") String nombreComercial,
-                      @Param("direccion") String direccion,
-                      @Param("telefono") String telefono);
+                      @Param("documentNumber") String documentNumber,
+                      @Param("legalName") String legalName,
+                      @Param("commercialName") String commercialName,
+                      @Param("address") String address,
+                      @Param("phone") String phone);
 
 
-    boolean existsByNroDocumento(String nroDocumento);
+    boolean existsByDocumentNumber(String documentNumber);
 }

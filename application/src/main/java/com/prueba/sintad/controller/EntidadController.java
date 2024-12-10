@@ -32,7 +32,7 @@ public class EntidadController {
         return ResponseEntity.ok(entidadServiceIn.findEntidadByIdIn(id));
     }
     @PostMapping
-    public ResponseEntity<ResponseApi<EntidadDTO>> saveEntidad(@Valid @RequestBody RequestSaveEntidad requestSaveEntidad){
+    public ResponseEntity<ResponseApi<ResponseEntidad>> saveEntidad(@Valid @RequestBody RequestSaveEntidad requestSaveEntidad){
         return new ResponseEntity<>(entidadServiceIn.saveEntidadIn(requestSaveEntidad), HttpStatus.CREATED);
     }
     @PutMapping("/{id}")

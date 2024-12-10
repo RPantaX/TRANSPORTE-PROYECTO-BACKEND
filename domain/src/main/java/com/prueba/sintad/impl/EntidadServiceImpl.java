@@ -23,7 +23,7 @@ public class EntidadServiceImpl implements EntidadServiceIn {
     }
 
     @Override
-    public ResponseApi<EntidadDTO> saveEntidadIn(RequestSaveEntidad entidad) {
+    public ResponseApi<ResponseEntidad> saveEntidadIn(RequestSaveEntidad entidad) {
         return entidadServiceOut.saveEntidadOut(entidad);
     }
 

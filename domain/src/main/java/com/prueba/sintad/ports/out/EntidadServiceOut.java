@@ -9,7 +9,7 @@ import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 
 public interface EntidadServiceOut {
     ResponseApi<ResponseEntidad> findEntidadByIdOut(Integer id);
-    ResponseApi<EntidadDTO> saveEntidadOut(RequestSaveEntidad entidad);
+    ResponseApi<ResponseEntidad> saveEntidadOut(RequestSaveEntidad entidad);
     ResponseApi<String> updateEntidadOut(RequestUpdateEntidad entidad, Integer id);
     ResponseApi<String> deleteEntidadOut(Integer id);
     ResponseApi<ResponseEntidadListPageable> findAllEntidadOut(int pageNumber, int pageSize, String orderBy, String sortDir);

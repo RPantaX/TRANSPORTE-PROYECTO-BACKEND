@@ -2,7 +2,6 @@ package com.prueba.sintad.adapters;
 
 import com.prueba.sintad.aggregates.constants.Constants;
 import com.prueba.sintad.aggregates.constants.Paths;
-import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotFoundException;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
@@ -10,22 +9,21 @@ import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
-import com.prueba.sintad.aggregates.response.TipoDocumentoResponse;
+import com.prueba.sintad.aggregates.response.DocumentTypeResponse;
 import com.prueba.sintad.aggregates.response.rest.ResponseReniec;
 import com.prueba.sintad.aggregates.response.rest.ResponseSunat;
 
 import com.prueba.sintad.entity.EntidadEntity;
-import com.prueba.sintad.entity.TipoContribuyenteEntity;
-import com.prueba.sintad.entity.TipoDocumentoEntity;
+import com.prueba.sintad.entity.TaxpayerTypeEntity;
+import com.prueba.sintad.entity.DocumentTypeEntity;
 
 import com.prueba.sintad.repository.EntidadRepository;
-import com.prueba.sintad.repository.TipoContribuyenteRepository;
-import com.prueba.sintad.repository.TipoDocumentoRepository;
+import com.prueba.sintad.repository.TaxpayerTypeRepository;
+import com.prueba.sintad.repository.DocumentTypeRepository;
 
 import com.prueba.sintad.rest.client.ReniecClient;
 import com.prueba.sintad.rest.client.SunatClient;
 
-import com.prueba.sintad.mapper.EntidadMapper;
 import com.prueba.sintad.ports.out.EntidadServiceOut;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -46,9 +44,8 @@ import java.util.List;
 public class EntidadAdapter implements EntidadServiceOut {
 
     private final EntidadRepository entidadRepository;
-    private final TipoContribuyenteRepository tipoContribuyenteRepository;
-    private final TipoDocumentoRepository tipoDocumentoRepository;
-    private final EntidadMapper entidadMapper;
+    private final TaxpayerTypeRepository taxpayerTypeRepository;
+    private final DocumentTypeRepository documentTypeRepository;
     private final ReniecClient reniec;
     private final SunatClient sunat;
 
@@ -67,25 +64,25 @@ public class EntidadAdapter implements EntidadServiceOut {
         return responseApi;
     }
     @Override
-    public ResponseApi<EntidadDTO> saveEntidadOut(RequestSaveEntidad entidad) {
-        if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento()))
+    public ResponseApi<ResponseEntidad> saveEntidadOut(RequestSaveEntidad entidad) {
+        if(entidadRepository.existsByDocumentNumber(entidad.getDocumentNumber()))
             throw new SintadAppNotAcceptableException("Entidad ya existe");
-        TipoDocumentoEntity tipoDocumentoEntity = tipoDocumentoRepository.findById(entidad.getIdTipoDocumento())
+        DocumentTypeEntity documentTypeEntity = documentTypeRepository.findById(entidad.getDocumentTypeId())
                 .orElseThrow( () -> new SintadAppNotAcceptableException("Tipo de documento no existe"));
-        TipoContribuyenteEntity tipoContribuyenteEntity = tipoContribuyenteRepository.findById(entidad.getIdTipoContribuyente())
+        TaxpayerTypeEntity taxpayerTypeEntity = taxpayerTypeRepository.findById(entidad.getTaxpayerTypeId())
                 .orElseThrow( () -> new SintadAppNotAcceptableException("Tipo de contribuyente no existe"));
         // Convertir campos a mayúsculas
-        entidad.setRazonSocial(entidad.getRazonSocial().toUpperCase());
-        entidad.setDireccion(entidad.getDireccion().toUpperCase());
-        entidad.setNombreComercial(entidad.getNombreComercial().toUpperCase());
+        entidad.setLegalName(entidad.getLegalName().toUpperCase());
+        entidad.setAddress(entidad.getAddress().toUpperCase());
+        entidad.setCommercialName(entidad.getCommercialName().toUpperCase());
 
-        validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), tipoDocumentoEntity);
+        validateLegalName(entidad.getDocumentNumber(), entidad.getLegalName(), documentTypeEntity);
 
-        EntidadEntity entidadEntity = createEntidadEntity(entidad, tipoDocumentoEntity, tipoContribuyenteEntity);
-        EntidadEntity entidadSaved = entidadRepository.save(entidadEntity);
-        EntidadDTO entidadDTO = entidadMapper.convertToDto(entidadSaved);
+        EntidadEntity entidadEntity = createEntidadEntity(entidad, documentTypeEntity, taxpayerTypeEntity);
+        entidadRepository.save(entidadEntity);
+        ResponseEntidad responseEntidad = getEntidad(entidadEntity);
         String path = Paths.Entidad;
-        ResponseApi<EntidadDTO> responseApi = createGenericResponseApi(entidadDTO,path, Constants.STATUS_CREATED);
+        ResponseApi<ResponseEntidad> responseApi = createGenericResponseApi(responseEntidad,path, Constants.STATUS_CREATED);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
     }
@@ -98,21 +95,21 @@ public class EntidadAdapter implements EntidadServiceOut {
                 .orElseThrow( () -> new SintadAppNotFoundException("Entidad no encontrada"));
 
         // Convertir campos a mayúsculas
-        entidad.setRazonSocial(entidad.getRazonSocial().toUpperCase());
-        entidad.setDireccion(entidad.getDireccion().toUpperCase());
-        entidad.setNombreComercial(entidad.getNombreComercial().toUpperCase());
+        entidad.setLegalName(entidad.getLegalName().toUpperCase());
+        entidad.setAddress(entidad.getAddress().toUpperCase());
+        entidad.setCommercialName(entidad.getCommercialName().toUpperCase());
 
-        if(!entidadEntity.getNroDocumento().equalsIgnoreCase(entidad.getNroDocumento())){
+        if(!entidadEntity.getDocumentNumber().equalsIgnoreCase(entidad.getDocumentNumber())){
             //Validar si el nuevo nroDocumento ya existe
-            if(entidadRepository.existsByNroDocumento(entidad.getNroDocumento()))
+            if(entidadRepository.existsByDocumentNumber(entidad.getDocumentNumber()))
                 throw new SintadAppNotAcceptableException("La Entidad ya existe");
-            validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), entidadEntity.getTipoDocumento());
+            validateLegalName(entidad.getDocumentNumber(), entidad.getLegalName(), entidadEntity.getDocumentTypeEntity());
         }
         else{
             //Si el nroDocumento es el mismo no tiene que validar si el nroDocumento ya existe
-            validateRazonSocial(entidad.getNroDocumento(), entidad.getRazonSocial(), entidadEntity.getTipoDocumento());
+            validateLegalName(entidad.getDocumentNumber(), entidad.getLegalName(), entidadEntity.getDocumentTypeEntity());
         }
-        entidadRepository.updateEntidadById(id, entidad.getNroDocumento(), entidad.getRazonSocial(), entidad.getNombreComercial(), entidad.getDireccion(), entidad.getTelefono());
+        entidadRepository.updateEntidadById(id, entidad.getDocumentNumber(), entidad.getLegalName(), entidad.getCommercialName(), entidad.getAddress(), entidad.getPhone());
         log.info("Entidad actualizada de {} a {}", entidadEntity, entidad);
         String path = Paths.Entidad + id;
         ResponseApi<String> responseApi = createGenericResponseApi(Constants.OPERATION_SUCCESS,path, Constants.STATUS_OK);
@@ -155,11 +152,11 @@ public class EntidadAdapter implements EntidadServiceOut {
         return responseApi;
     }
 
-    private void validateRazonSocial(String nroDocumento, String razonSocial, TipoDocumentoEntity tipoDocumentoEntity) {
-        if(tipoDocumentoEntity.getNombre().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_RUC)){
+    private void validateLegalName(String nroDocumento, String razonSocial, DocumentTypeEntity documentTypeEntity) {
+        if(documentTypeEntity.getName().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_RUC)){
             validateRUC(nroDocumento,razonSocial);
             }
-        if(tipoDocumentoEntity.getNombre().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_DNI)){
+        if(documentTypeEntity.getName().equalsIgnoreCase(Constants.TIPO_DOCUMENTO_DNI)){
             validateDNI(nroDocumento, razonSocial);
         }
     }
@@ -181,16 +178,16 @@ public class EntidadAdapter implements EntidadServiceOut {
         }
     }
 
-    private EntidadEntity createEntidadEntity(RequestSaveEntidad entidad, TipoDocumentoEntity tipoDocumentoEntity, TipoContribuyenteEntity tipoContribuyenteEntity) {
+    private EntidadEntity createEntidadEntity(RequestSaveEntidad entity, DocumentTypeEntity documentTypeEntity, TaxpayerTypeEntity taxpayerTypeEntity) {
         return EntidadEntity.builder()
-                .tipoDocumento(tipoDocumentoEntity)
-                .nroDocumento(entidad.getNroDocumento())
-                .razonSocial(entidad.getRazonSocial())
-                .nombreComercial(entidad.getNombreComercial())
-                .tipoContribuyente(tipoContribuyenteEntity)
-                .direccion(entidad.getDireccion())
-                .telefono(entidad.getTelefono())
-                .estado(Constants.STATUS_ACTIVE)
+                .documentTypeEntity(documentTypeEntity)
+                .documentNumber(entity.getDocumentNumber())
+                .legalName(entity.getLegalName())
+                .commercialName(entity.getCommercialName())
+                .taxpayerTypeEntity(taxpayerTypeEntity)
+                .address(entity.getAddress())
+                .phone(entity.getPhone())
+                .state(Constants.STATUS_ACTIVE)
                 .build();
     }
 
@@ -205,30 +202,30 @@ public class EntidadAdapter implements EntidadServiceOut {
     }
 
     private ResponseEntidad getEntidad(EntidadEntity entidadEntity) {
-        TipoDocumentoResponse tipoDocumentoResponse = createTipoDocumentoResponse(entidadEntity);
+        DocumentTypeResponse tipoDocumentoResponse = createDocumentTypeResponse(entidadEntity);
         ResponseEntidad responseEntidad = createResponseEntidad(entidadEntity, tipoDocumentoResponse);
         log.info("ENTIDAD: {}", responseEntidad);
         return responseEntidad;
     }
 
-    private TipoDocumentoResponse createTipoDocumentoResponse(EntidadEntity entidadEntity) {
-        return TipoDocumentoResponse.builder()
-                .codigo(entidadEntity.getTipoDocumento().getCodigo())
-                .nombre(entidadEntity.getTipoDocumento().getNombre())
-                .descripcion(entidadEntity.getTipoDocumento().getDescripcion())
+    private DocumentTypeResponse createDocumentTypeResponse(EntidadEntity entidadEntity) {
+        return DocumentTypeResponse.builder()
+                .code(entidadEntity.getDocumentTypeEntity().getCode())
+                .name(entidadEntity.getDocumentTypeEntity().getName())
+                .description(entidadEntity.getDocumentTypeEntity().getDescription())
                 .build();
     }
 
-    private ResponseEntidad createResponseEntidad(EntidadEntity entidadEntity, TipoDocumentoResponse tipoDocumentoResponse) {
+    private ResponseEntidad createResponseEntidad(EntidadEntity entidadEntity, DocumentTypeResponse documentTypeResponse) {
         return ResponseEntidad.builder()
                 .id(entidadEntity.getId())
-                .nroDocumento(entidadEntity.getNroDocumento())
-                .razonSocial(entidadEntity.getRazonSocial())
-                .nombreComercial(entidadEntity.getNombreComercial())
-                .direccion(entidadEntity.getDireccion())
-                .telefono(entidadEntity.getTelefono())
-                .tipoContribuyente(entidadEntity.getTipoContribuyente().getNombre())
-                .tipoDocumentoResponse(tipoDocumentoResponse)
+                .documentNumber(entidadEntity.getDocumentNumber())
+                .legalName(entidadEntity.getLegalName())
+                .commercialName(entidadEntity.getCommercialName())
+                .address(entidadEntity.getAddress())
+                .phone(entidadEntity.getPhone())
+                .taxpayerType(entidadEntity.getTaxpayerTypeEntity().getName())
+                .documentTypeResponse(documentTypeResponse)
                 .build();
     }
     public ResponseSunat getExecutionSunat(String numero){

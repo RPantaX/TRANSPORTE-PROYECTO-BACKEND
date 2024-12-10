@@ -2,6 +2,7 @@ package com.prueba.sintad.aggregates.response;
 
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Builder
@@ -12,7 +13,7 @@ import java.util.List;
 public class ResponseApiList<T> {
     private String status;
     private String message;
-    private String timestamp;
+    private Timestamp timestamp;
     private List<T> data;
     private String path;
 }

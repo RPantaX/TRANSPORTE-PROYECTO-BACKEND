@@ -19,27 +19,27 @@ public class EntidadEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_documento", nullable = false)
-    private TipoDocumentoEntity tipoDocumento;
+    private DocumentTypeEntity documentTypeEntity;
 
     @Column(name = "nro_documento", nullable = false, unique = true, length = 25)
-    private String nroDocumento;
+    private String documentNumber;
 
     @Column(name = "razon_social", nullable = false, length = 100)
-    private String razonSocial;
+    private String legalName;
 
     @Column(name = "nombre_comercial", length = 100)
-    private String nombreComercial;
+    private String commercialName;
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_contribuyente")
-    private TipoContribuyenteEntity tipoContribuyente;
+    private TaxpayerTypeEntity taxpayerTypeEntity;
 
     @Column(name = "direccion", length = 250)
-    private String direccion;
+    private String address;
 
     @Column(name = "telefono", length = 50)
-    private String telefono;
+    private String phone;
 
     @Column(name = "estado", nullable = false)
-    private Boolean estado;
+    private Boolean state;
 }

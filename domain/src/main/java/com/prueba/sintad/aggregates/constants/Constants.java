@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 
 public class Constants {
     public static final Boolean STATUS_ACTIVE = true;
-    public static final Boolean STATUS_INACTIVE = false;
     public static final String OPERATION_SUCCESS= "Operación realizada con éxito";
 
     public static final String STATUS_OK = "200";
@@ -25,6 +24,8 @@ public class Constants {
     public static final String SIZE_PAG_BY_DEFECT="10";
     public static final String ORDER_BY_DEFECT_ALL="id";
     public static final String ORDER_DIRECT_BY_DEFECT="0";
+
+    public static final String USER_DEFAULT="DEVELOPER";
     public static Timestamp getTimestamp(){
         long currentTime = System.currentTimeMillis();
         return new Timestamp(currentTime);

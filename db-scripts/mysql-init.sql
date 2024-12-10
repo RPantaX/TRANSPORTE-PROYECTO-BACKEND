@@ -78,3 +78,20 @@ INSERT INTO `tb_tipo_documento` VALUES ('3', '11', 'PARTIDA DE NACIMIENTO - IDEN
 INSERT INTO `tb_tipo_documento` VALUES ('4', '99', 'OTROS', 'OTROS', '');
 INSERT INTO `tb_tipo_documento` VALUES ('5', '6', 'RUC', 'REGISTRO UNICO DEL CONTRIBUYENTE', '');
 INSERT INTO `tb_tipo_documento` VALUES ('6', '1', 'DNI', 'DOCUMENTO NACIONAL DE IDENTIDAD', '');
+
+-- Tabla para los usuarios
+DROP TABLE IF EXISTS `tb_user`;
+CREATE TABLE `tb_user` (
+                       `id_user`  int(11) NOT NULL AUTO_INCREMENT,
+                       `numero_celular` VARCHAR(255) NULL,
+                       `usuario` VARCHAR(255) NOT NULL UNIQUE,
+                       `password` VARCHAR(255) NOT NULL,
+                       `estado` bit(1) NOT NULL DEFAULT b'1',
+                       `modificado_por` VARCHAR(15) NOT NULL,
+                       `creado_en` TIMESTAMP NOT NULL,
+                       `modificado_en` TIMESTAMP NULL,
+                       `eliminado_en` TIMESTAMP NULL,
+                       `rol` ENUM('USER', 'ADMIN') NOT NULL,
+                        PRIMARY KEY (`id_user`),
+                        UNIQUE KEY `usuario_UNIQUE` (`usuario`)
+);

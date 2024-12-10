@@ -11,17 +11,17 @@ import lombok.*;
 public class ResponseEntidad {
     private Integer id;
 
-    private String nroDocumento;
+    private String documentNumber;
 
-    private String razonSocial;
+    private String legalName;
 
-    private String nombreComercial;
+    private String commercialName;
 
-    private String direccion;
+    private String address;
 
-    private String telefono;
+    private String phone;
 
-    private String tipoContribuyente;
+    private String taxpayerType;
 
-    private TipoDocumentoResponse tipoDocumentoResponse;
+    private DocumentTypeResponse documentTypeResponse;
 }
