@@ -79,7 +79,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // Permitir cualquier origen (modifica según tus necesidades)
+        configuration.addAllowedOrigin("*"); // Permitir cualquier origen
         configuration.addAllowedMethod("*"); // Permitir todos los métodos HTTP
         configuration.addAllowedHeader("*"); // Permitir todos los encabezados
 
