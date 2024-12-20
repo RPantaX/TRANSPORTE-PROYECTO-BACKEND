@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:latest
-    container_name: mysql_prueba_sintad
+    container_name: mysql_transporte
     ports:
       - "3308:3306"
     network_mode: bridge

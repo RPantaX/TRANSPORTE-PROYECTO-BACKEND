@@ -1,9 +1,12 @@
 package com.prueba.sintad.aggregates.constants;
 
+import com.prueba.sintad.aggregates.response.ResponseApi;
+
 import java.sql.Timestamp;
 
 public class Constants {
     public static final Boolean STATUS_ACTIVE = true;
+    public static final Boolean STATUS_INACTIVE = false;
     public static final String OPERATION_SUCCESS= "Operación realizada con éxito";
 
     public static final String STATUS_OK = "200";
@@ -38,5 +41,14 @@ public class Constants {
         parameters.append("&orderBy=").append(orderBy);
         parameters.append("&sortDir=").append(sortDir);
         return parameters;
+    }
+    public static <T> ResponseApi<T> createGenericResponseApi(T data, String path, String status) {
+        return ResponseApi.<T>builder()
+                .path(path)
+                .message(Constants.MESSAGE_OK)
+                .status(status)
+                .timestamp(Constants.getTimestamp())
+                .data(data)
+                .build();
     }
 }

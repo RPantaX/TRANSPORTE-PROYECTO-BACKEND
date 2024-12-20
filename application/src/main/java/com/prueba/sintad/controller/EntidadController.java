@@ -1,9 +1,11 @@
 package com.prueba.sintad.controller;
 
 import com.prueba.sintad.aggregates.constants.Constants;
+import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
+import com.prueba.sintad.aggregates.response.ResponseApiList;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 
@@ -27,6 +29,10 @@ public class EntidadController {
                                                                                             @RequestParam(value = "sortBy", defaultValue = Constants.ORDER_BY_DEFECT_ALL, required = false) String sortBy,
                                                                                             @RequestParam(value = "sortDir", defaultValue = Constants.ORDER_DIRECT_BY_DEFECT, required = false) String sortDir){
         return ResponseEntity.ok(entidadServiceIn.findAllEntidadIn(pageNo, pageSize, sortBy, sortDir));
+    }
+    @GetMapping("/allDTO")
+    public ResponseEntity<ResponseApiList<EntidadDTO>> listEntitiDTOList(){
+        return ResponseEntity.ok(entidadServiceIn.finfAllEntidadIn());
     }
     @GetMapping("/{id}")
     public ResponseEntity<ResponseApi<ResponseEntidad>> getEntidadById(@PathVariable(value = "id") Integer id){

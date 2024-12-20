@@ -1,8 +1,10 @@
 package com.prueba.sintad.impl;
 
+import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
 import com.prueba.sintad.aggregates.response.ResponseApi;
+import com.prueba.sintad.aggregates.response.ResponseApiList;
 import com.prueba.sintad.aggregates.response.ResponseEntidad;
 import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
 import com.prueba.sintad.ports.in.EntidadServiceIn;
@@ -39,5 +41,10 @@ public class EntidadServiceImpl implements EntidadServiceIn {
     @Override
     public ResponseApi<ResponseEntidadListPageable> findAllEntidadIn(int pageNumber, int pageSize, String orderBy, String sortDir) {
         return entidadServiceOut.findAllEntidadOut(pageNumber, pageSize, orderBy, sortDir);
+    }
+
+    @Override
+    public ResponseApiList<EntidadDTO> finfAllEntidadIn() {
+        return entidadServiceOut.finfAllEntidadOut();
     }
 }

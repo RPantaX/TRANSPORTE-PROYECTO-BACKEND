@@ -2,14 +2,12 @@ package com.prueba.sintad.adapters;
 
 import com.prueba.sintad.aggregates.constants.Constants;
 import com.prueba.sintad.aggregates.constants.Paths;
+import com.prueba.sintad.aggregates.dto.EntidadDTO;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotAcceptableException;
 import com.prueba.sintad.aggregates.exceptions.SintadAppNotFoundException;
 import com.prueba.sintad.aggregates.request.RequestSaveEntidad;
 import com.prueba.sintad.aggregates.request.RequestUpdateEntidad;
-import com.prueba.sintad.aggregates.response.ResponseApi;
-import com.prueba.sintad.aggregates.response.ResponseEntidad;
-import com.prueba.sintad.aggregates.response.ResponseEntidadListPageable;
-import com.prueba.sintad.aggregates.response.DocumentTypeResponse;
+import com.prueba.sintad.aggregates.response.*;
 import com.prueba.sintad.aggregates.response.rest.ResponseReniec;
 import com.prueba.sintad.aggregates.response.rest.ResponseSunat;
 
@@ -17,6 +15,7 @@ import com.prueba.sintad.entity.EntidadEntity;
 import com.prueba.sintad.entity.TaxpayerTypeEntity;
 import com.prueba.sintad.entity.DocumentTypeEntity;
 
+import com.prueba.sintad.mapper.EntidadMapper;
 import com.prueba.sintad.repository.EntidadRepository;
 import com.prueba.sintad.repository.TaxpayerTypeRepository;
 import com.prueba.sintad.repository.DocumentTypeRepository;
@@ -48,6 +47,7 @@ public class EntidadAdapter implements EntidadServiceOut {
     private final DocumentTypeRepository documentTypeRepository;
     private final ReniecClient reniec;
     private final SunatClient sunat;
+    private final EntidadMapper entidadMapper;
 
     @Value("${token.rest.api}")
     String tokenApi;
@@ -150,6 +150,22 @@ public class EntidadAdapter implements EntidadServiceOut {
         ResponseApi<ResponseEntidadListPageable> responseApi = createGenericResponseApi(responseEntidadListPageable,path, Constants.STATUS_OK);
         log.info("RESPONSE ENTIDAD: {}", responseApi);
         return responseApi;
+    }
+
+    @Override
+    public ResponseApiList<EntidadDTO> finfAllEntidadOut() {
+        List<EntidadEntity> entidadList = entidadRepository.findAll();
+        List<EntidadDTO> entidadDTOList = entidadList.stream().map(entidadMapper::convertToDto).toList();
+        String path = Paths.Entidad;
+        ResponseApiList<EntidadDTO> responseApiList = ResponseApiList.<EntidadDTO>builder()
+                .path(path)
+                .message(Constants.MESSAGE_OK)
+                .status(Constants.STATUS_OK)
+                .timestamp(Constants.getTimestamp())
+                .data(entidadDTOList)
+                .build();
+        log.info("RESPONSE ENTIDAD: {}", responseApiList);
+        return responseApiList;
     }
 
     private void validateLegalName(String nroDocumento, String razonSocial, DocumentTypeEntity documentTypeEntity) {

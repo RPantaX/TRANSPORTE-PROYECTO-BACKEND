@@ -9,7 +9,7 @@ spring:
     properties:
       hibernate.format_sql: true
   datasource:
-    url: jdbc:mysql://localhost:3308/db_sintad
+    url: jdbc:mysql://localhost:3308/db_transporte
     username: root
     password: 123456
 token:

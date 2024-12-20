@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS `db_sintad`;
-USE db_sintad;
+CREATE DATABASE IF NOT EXISTS `db_transporte`;
+USE db_transporte;
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
@@ -79,6 +79,7 @@ INSERT INTO `tb_tipo_documento` VALUES ('4', '99', 'OTROS', 'OTROS', '');
 INSERT INTO `tb_tipo_documento` VALUES ('5', '6', 'RUC', 'REGISTRO UNICO DEL CONTRIBUYENTE', '');
 INSERT INTO `tb_tipo_documento` VALUES ('6', '1', 'DNI', 'DOCUMENTO NACIONAL DE IDENTIDAD', '');
 
+
 -- Tabla para los usuarios
 DROP TABLE IF EXISTS `tb_user`;
 CREATE TABLE `tb_user` (
@@ -95,3 +96,47 @@ CREATE TABLE `tb_user` (
                         PRIMARY KEY (`id_user`),
                         UNIQUE KEY `usuario_UNIQUE` (`usuario`)
 );
+
+
+-- Tabla para Camiones
+DROP TABLE IF EXISTS `tb_camion`;
+
+CREATE TABLE `tb_camion` (
+                             `id_camion` INT(11) NOT NULL AUTO_INCREMENT,
+                             `placa` VARCHAR(20) NOT NULL UNIQUE,
+                             `marca` VARCHAR(50) NOT NULL,
+                             `modelo` VARCHAR(50) NOT NULL,
+                             `year_fabricacion` YEAR NOT NULL,
+                             `estado` BIT(1) NOT NULL DEFAULT b'1',
+                             `creado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                             `modificado_en` TIMESTAMP NULL DEFAULT NULL,
+                             `eliminado_en` TIMESTAMP NULL DEFAULT NULL,
+                             PRIMARY KEY (`id_camion`),
+                             UNIQUE KEY `placa_UNIQUE` (`placa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Tabla para Camioneros
+DROP TABLE IF EXISTS `tb_camionero`;
+CREATE TABLE `tb_camionero` (
+                                `id_camionero` INT(11) NOT NULL AUTO_INCREMENT,
+                                `dni` VARCHAR(8) NOT NULL,
+                                `nombres` VARCHAR(200) NOT NULL,
+                                `apellidos` VARCHAR(200) NOT NULL ,
+                                `direccion` VARCHAR(250)  NULL ,
+                                `telefono` VARCHAR(9) NULL ,
+                                `edad` INT(11) NOT NULL ,
+                                `id_entidad` INT(11) NOT NULL,
+                                `id_camion` INT(11) NOT NULL,
+                                `nro_licencia` VARCHAR(20) NOT NULL UNIQUE,
+                                `estado` BIT(1) NOT NULL DEFAULT b'1',
+                                `creado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                `modificado_en` TIMESTAMP NULL DEFAULT NULL,
+                                `eliminado_en` TIMESTAMP NULL DEFAULT NULL,
+                                PRIMARY KEY (`id_camionero`),
+                                UNIQUE KEY `id_entidad_UNIQUE` (`id_entidad`),
+                                UNIQUE KEY `id_camion_UNIQUE` (`id_camion`),
+                                KEY `fk_camionero_entidad_idx` (`id_entidad`),
+                                KEY `fk_camionero_camion_idx` (`id_camion`),
+                                CONSTRAINT `fk_camionero_entidad` FOREIGN KEY (`id_entidad`) REFERENCES `tb_entidad` (`id_entidad`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                CONSTRAINT `fk_camionero_camion` FOREIGN KEY (`id_camion`) REFERENCES `tb_camion` (`id_camion`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

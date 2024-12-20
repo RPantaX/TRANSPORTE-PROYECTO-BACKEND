@@ -32,7 +32,7 @@ public class RequestSaveEntidad {
     @Pattern(regexp = "\\d+", message = "El teléfono solo puede contener numeros")
     private String phone;
 
-    @NotNull(message = "El ID del tipo de documento no puede ser nulo")
+    @NotNull(message = "El ID del tipo de contribuyente no puede ser nulo")
     private Integer taxpayerTypeId;
 
     @NotNull(message = "El ID del tipo de contribuyente no puede ser nulo")
